@@ -9,4 +9,16 @@ body {
     display: flex;
     justify-content: center;
     align-items: center;
+    border: 5px solid black;
+    flex-direction: column;
+}
+
+.boardRow {
+    display: flex;
+}
+
+.boardColumn {
+    height: 60px;
+    width: 60px;
+    background-color: black;
 }

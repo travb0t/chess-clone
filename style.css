@@ -10,6 +10,7 @@ body {
     justify-content: center;
     align-items: center;
     border: 5px solid black;
+    border-radius: 5px;
     flex-direction: column;
 }
 
@@ -18,7 +19,21 @@ body {
 }
 
 .boardColumn {
+    display: flex;
     height: 60px;
     width: 60px;
-    background-color: black;
 }
+
+.selected {
+    background-color: lightgreen;
+}
+
+img {
+    margin: auto;
+    display: flex;
+}
+
+/* img.black, img.white {
+    margin: auto;
+    display: flex;
+} */

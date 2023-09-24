@@ -4,6 +4,7 @@ let rowArray = ["8", "7", "6", "5", "4", "3", "2", "1"];
 // columnArray was formerly a-h.
 let columnArray = ["1", "2", "3", "4", "5", "6", "7", "8"];
 let pieceName = ["rook", "knight", "bishop", "queen", "king", "bishop", "knight", "rook", "pawn"]
+let invalidSpaces = [19, 20, 29, 30, 39, 40, 49, 50, 59, 60, 69, 70, 79, 80];
 
 let currentPiece = {
     type: "",
@@ -122,9 +123,26 @@ document.getElementById("gameBoard").addEventListener("click", (e) => {
     }
 
     if (targetPiece.classList.contains("empty")) {
+
+        if (pieceSelected == 1) {
+            movePiece(targetPiece);
+        }
+
+        currentPiece = {
+            type: "",
+            color: targetPiece.getAttribute("class"),
+            location: "",
+            source: ""
+        };
+
+        setMoveRange();
+
         pieceSelected = 0;
-        console.log("empty");
+        previousMoves = [0];
+
+        console.log("Empty");
         return;
+
     }
 
     currentPiece.source = targetPiece.getAttribute("src");
@@ -141,8 +159,59 @@ document.getElementById("gameBoard").addEventListener("click", (e) => {
     pieceSelected = 1;
     targetPiece.style.backgroundColor = "rgba(144, 238, 144, 0.6)";
 
+    setMoveRange();
+
+})
+
+function setMoveRange() {
+
+    console.log("wooo");
+
+    let possibleMoves = [];
+    let startingLocation = Number(currentPiece.location);
+    let moveDist;
+    let specialMove = 0;
+    
     if (currentPiece.type === "pawn") {
-        movePawn();
+    
+        if (currentPiece.color == "black") {
+            moveDist = 1;
+            if (currentPiece.location[1] == 2) {
+                specialMove = 1;
+            }
+        } else if (currentPiece.color == "white") {
+            moveDist = -1;
+            if (currentPiece.location[1] == 7) {
+                specialMove = -1;
+            }
+        }
+    
+        possibleMoves.push(startingLocation + moveDist);
+
+        if (specialMove !== 0) {
+            possibleMoves.push(startingLocation + moveDist + specialMove);    
+        }
+
+        let pawnAttackLocation = [];
+        pawnAttackLocation.push(startingLocation + moveDist - 10);
+        pawnAttackLocation.push(startingLocation + moveDist + 10);
+        validLocation(pawnAttackLocation);
+
+        for (let i = 0; i < pawnAttackLocation.length; i++) {  
+            let pawnAttack = document.getElementById(pawnAttackLocation[i]);
+            if (currentPiece.color == "black") {
+                if (pawnAttack.classList.contains("white")) {
+                    possibleMoves.push(pawnAttackLocation[i]);
+                }
+            } else if (currentPiece.color == "white") {
+                if (pawnAttack.classList.contains("black")) {
+                    possibleMoves.push(pawnAttackLocation[i]);
+                }
+            }
+        }
+
+        validLocation(possibleMoves);
+
     } else if (currentPiece.type == "rook") {
         console.log("rook");
     } else if (currentPiece.type == "knight") {
@@ -155,33 +224,11 @@ document.getElementById("gameBoard").addEventListener("click", (e) => {
         console.log("king");
     }
 
-})
-
-function movePawn() {
-
-    let startingLocation = Number(currentPiece.location);
-    let possibleMoves = [];
-    let x;
-
-    if (currentPiece.color == "black") {
-        x = 1
-    } else if (currentPiece.color == "white") {
-        x = -1
-    }
-
-    possibleMoves.push(startingLocation + x);
-    if (startingLocation > 20) {
-        possibleMoves.push(startingLocation + x - 10);
-    }
-    if (startingLocation < 80) {
-        possibleMoves.push(startingLocation + x + 10);
-    }
-
-    console.log(possibleMoves);
+    // console.log(possibleMoves);
 
     if (previousMoves[0] == 0) {
         previousMoves = possibleMoves;
-        console.log(previousMoves);
+        // console.log(previousMoves);
     } else if (possibleMoves !== previousMoves) {
         for (let i = 0; i < previousMoves.length; i++) {
             document.getElementById(previousMoves[i]).style.backgroundColor = "rgba(0, 0, 0, 0)";
@@ -189,14 +236,42 @@ function movePawn() {
         previousMoves = possibleMoves;
     }
 
-    for (let j = 0; j < possibleMoves.length; j++) {
-        document.getElementById(possibleMoves[j]).style.backgroundColor = "rgba(255, 255, 0, 0.6)";
+    if (currentPiece.color != "empty") {
+        for (let j = 0; j < possibleMoves.length; j++) {
+            document.getElementById(possibleMoves[j]).style.backgroundColor = "rgba(255, 255, 0, 0.6)";
+        }
     }
 
 }
 
-function moveToLocation() {
-    
+function validLocation(givenMoveArray) {
+    for (let k = 0; k < givenMoveArray.length; k++) {
+        if (givenMoveArray[k] < 11 || givenMoveArray[k] > 88) {
+            givenMoveArray.splice(k, 1);
+        } else {
+            for (let l = 0; l < invalidSpaces.length; l++) {
+                if (givenMoveArray[k] == invalidSpaces[l]) {
+                    givenMoveArray.splice(k, 1);
+                }
+            }
+        }
+    }
+}
+
+function movePiece(potentialMove) {
+
+    if (potentialMove.style.backgroundColor == "rgba(255, 255, 0, 0.6)") {
+
+        let lastPiece = document.getElementById(currentPiece.location);
+
+        potentialMove.setAttribute("class", currentPiece.color);
+        potentialMove.setAttribute("src", currentPiece.source);
+
+        lastPiece.setAttribute("class","empty");
+        lastPiece.removeAttribute("src");
+
+    }
+
 }
 
 initGameBoard();

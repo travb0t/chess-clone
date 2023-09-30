@@ -11,14 +11,27 @@ Done:
 - Add addresses to each space.
 - make pieces selectable.
 - Highlight selected piece and remove highlight when a piece isn't selected.
+- When a piece is selected highlight legal placements with yellow.
+- Make a pawn able to move.
+- create a turn based system that swaps control between white and black.
+- create a capture mechanic.
+- Add an En Passant mechanic to pawns.
+- Add movement functionality to rooks.
+- Change the way the image is removed from an "empty" space to use a removeChild method. *this prevents non-refresh image ghosts.*
 
 
 Current tasks:
-- When a piece is selected highlight legal placements with yellow.
-- Make a pawn able to move.
+- Add movement to:
+    - Bishop
+    - Knight
+    - Queen
+    - King
 
 
 Future To Do:
-
-- create a turn based system that swaps control between white and black.
-- create a capture mechanic.
+- Add ability for pawns to be exchanged for different pieces when they reach the enemy backline.
+- Add check system to king.
+- Add win/loss condition to game.
+- Add "New Game" function.
+- Clean up code:
+    - Redo ID naming system to get rid of need for arrays containing the row and column numbers. *use a for...loop system instead.*

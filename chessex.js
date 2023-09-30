@@ -6,6 +6,18 @@ let columnArray = ["1", "2", "3", "4", "5", "6", "7", "8"];
 let pieceName = ["rook", "knight", "bishop", "queen", "king", "bishop", "knight", "rook", "pawn"]
 let invalidSpaces = [19, 20, 29, 30, 39, 40, 49, 50, 59, 60, 69, 70, 79, 80];
 
+let turnCount = 1;
+let enPassantWhite = {
+    empty: "",
+    current: "",
+    turn: 0
+};
+let enPassantBlack = {
+    empty: "",
+    current: "",
+    turn: 0
+};
+
 let currentPiece = {
     type: "",
     color: "",
@@ -38,6 +50,7 @@ function initGameBoard() {
             column.className = "boardColumn";
             cell.setAttribute("id", `${columnNum}${rowNum}`);
             cell.setAttribute("class", "empty");
+            cell.setAttribute("src", "");
             // cell.setAttribute("alt", `${columnNum}${rowNum}`);
             cell.setAttribute("width", "60px");
             cell.setAttribute("height", "60px");
@@ -122,7 +135,7 @@ document.getElementById("gameBoard").addEventListener("click", (e) => {
         previousPiece = targetPiece;
     }
 
-    if (targetPiece.classList.contains("empty")) {
+    if (currentPiece.color != targetPiece.getAttribute("class") && pieceSelected == 1 || targetPiece.classList.contains("empty")) {
 
         if (pieceSelected == 1) {
             movePiece(targetPiece);
@@ -140,9 +153,19 @@ document.getElementById("gameBoard").addEventListener("click", (e) => {
         pieceSelected = 0;
         previousMoves = [0];
 
-        console.log("Empty");
+        // console.log("Empty");
         return;
 
+    }
+
+    if (turnCount % 2 == 0) {
+        if (targetPiece.getAttribute("class") != "black") {
+            return;
+        }
+    } else if (turnCount % 2 != 0) {
+        if (targetPiece.getAttribute("class") != "white") {
+            return;
+        }
     }
 
     currentPiece.source = targetPiece.getAttribute("src");
@@ -152,9 +175,10 @@ document.getElementById("gameBoard").addEventListener("click", (e) => {
     for (let i = 0; i < 6; i++) {
         if (currentPiece.source.includes(pieceName[i+3])) {
             currentPiece.type = pieceName[i+3];
-            console.log(currentPiece);
         }
     }
+
+    // console.log(currentPiece);
 
     pieceSelected = 1;
     targetPiece.style.backgroundColor = "rgba(144, 238, 144, 0.6)";
@@ -164,8 +188,6 @@ document.getElementById("gameBoard").addEventListener("click", (e) => {
 })
 
 function setMoveRange() {
-
-    console.log("wooo");
 
     let possibleMoves = [];
     let startingLocation = Number(currentPiece.location);
@@ -177,12 +199,16 @@ function setMoveRange() {
         if (currentPiece.color == "black") {
             moveDist = 1;
             if (currentPiece.location[1] == 2) {
+                enPassantBlack.empty = startingLocation + moveDist;
                 specialMove = 1;
+                enPassantBlack.current = startingLocation + moveDist + specialMove;
             }
         } else if (currentPiece.color == "white") {
             moveDist = -1;
             if (currentPiece.location[1] == 7) {
+                enPassantWhite.empty = startingLocation + moveDist;
                 specialMove = -1;
+                enPassantWhite.current = startingLocation + moveDist + specialMove;
             }
         }
     
@@ -190,6 +216,12 @@ function setMoveRange() {
 
         if (specialMove !== 0) {
             possibleMoves.push(startingLocation + moveDist + specialMove);    
+        }
+
+        for (let i = 0; i < possibleMoves.length; i++) {
+            if (document.getElementById(possibleMoves[i]).getAttribute("class") != "empty") {
+                possibleMoves.splice(i, 2);
+            }
         }
 
         let pawnAttackLocation = [];
@@ -213,7 +245,41 @@ function setMoveRange() {
         validLocation(possibleMoves);
 
     } else if (currentPiece.type == "rook") {
-        console.log("rook");
+        let directionSet = [1, 10, -1, -10];
+        let rookSpaceCheck;
+        let rookSpaces = [];
+
+        for (let i = 0; i < 4; i++) {
+            for (let j = 0; j < 8; j++) {
+                rookSpaceCheck = startingLocation + (directionSet[i] * (j+1));
+
+                rookSpaces.push(rookSpaceCheck);
+
+                validLocation(rookSpaces);
+
+                if (rookSpaceCheck != rookSpaces[rookSpaces.length - 1]) {
+                    rookSpaceCheck = null;
+                }
+
+                // console.log(rookSpaceCheck);
+
+                if (rookSpaceCheck == null || document.getElementById(rookSpaceCheck).getAttribute("class") != "empty") {
+                    // console.log("Path is blocked.");
+                    if (rookSpaceCheck != null && currentPiece.color == "black" && document.getElementById(rookSpaceCheck).getAttribute("class") == "white") {
+                        possibleMoves.push(rookSpaceCheck);
+                    } else if (rookSpaceCheck != null && currentPiece.color == "white" && document.getElementById(rookSpaceCheck).getAttribute("class") == "black") {
+                        possibleMoves.push(rookSpaceCheck);
+                    }
+                    break;
+                } else {
+                    possibleMoves.push(rookSpaceCheck);
+                }
+            }
+        }
+
+        validLocation(possibleMoves);
+        // console.log(possibleMoves);
+
     } else if (currentPiece.type == "knight") {
         console.log("knight");
     } else if (currentPiece.type == "bishop") {
@@ -244,6 +310,75 @@ function setMoveRange() {
 
 }
 
+function movePiece(potentialMove) {
+
+    if (potentialMove.style.backgroundColor == "rgba(255, 255, 0, 0.6)") {
+
+        let lastPiece;
+        let passantSpace = "";
+
+        if (currentPiece.type == "pawn" && currentPiece.color == "white" && potentialMove.getAttribute("id") == enPassantBlack.empty) {
+            lastPiece = document.getElementById(enPassantBlack.current);
+            passantSpace = document.getElementById(currentPiece.location);
+        } else if (currentPiece.type == "pawn" && currentPiece.color == "black" && potentialMove.getAttribute("id") == enPassantWhite.empty) {
+            lastPiece = document.getElementById(enPassantWhite.current);
+            passantSpace = document.getElementById(currentPiece.location);
+        } else {
+            lastPiece = document.getElementById(currentPiece.location);
+        }
+
+        if (currentPiece.type == "pawn" && currentPiece.color == "black" && potentialMove.getAttribute("id")[1] == 4 && currentPiece.location[1] == 2) {
+            document.getElementById(enPassantBlack.empty).setAttribute("class", currentPiece.color);
+            enPassantBlack.turn = turnCount;
+        } else if (currentPiece.type == "pawn" && currentPiece.color == "white" && potentialMove.getAttribute("id")[1] == 5 && currentPiece.location[1] == 7) {
+            document.getElementById(enPassantWhite.empty).setAttribute("class", currentPiece.color);
+            enPassantWhite.turn = turnCount;
+        }
+
+        potentialMove.setAttribute("class", currentPiece.color);
+        potentialMove.setAttribute("src", currentPiece.source);
+
+        lastPiece.setAttribute("class","empty");
+        lastPiece.setAttribute("src", "");
+        // lastPiece.removeAttribute("src");
+
+        let parent = lastPiece.parentNode;
+        parent.removeChild(lastPiece);
+        parent.appendChild(lastPiece);
+
+
+        if (passantSpace !== "") {
+            passantSpace.setAttribute("class","empty");
+            passantSpace.setAttribute("src", "");
+            passantSpace.removeAttribute("src");
+        }
+
+        turnCount += 1;
+        
+        if (enPassantBlack.turn != 0 && turnCount > enPassantBlack.turn + 1) {
+            if (!document.getElementById(enPassantBlack.empty).hasAttribute("src")) {
+                document.getElementById(enPassantBlack.empty).setAttribute("class", "empty");
+            }
+            enPassantBlack = {
+                empty: "",
+                current: "",
+                turn: 0
+            };
+        } else if (enPassantWhite.turn != 0 && turnCount > enPassantWhite.turn + 1) {
+            if (!document.getElementById(enPassantWhite.empty).hasAttribute("src")) {
+                document.getElementById(enPassantWhite.empty).setAttribute("class", "empty");
+            }
+            enPassantWhite = {
+                empty: "",
+                current: "",
+                turn: 0
+            };
+        }
+
+    }
+
+}
+
 function validLocation(givenMoveArray) {
     for (let k = 0; k < givenMoveArray.length; k++) {
         if (givenMoveArray[k] < 11 || givenMoveArray[k] > 88) {
@@ -256,22 +391,6 @@ function validLocation(givenMoveArray) {
             }
         }
     }
-}
-
-function movePiece(potentialMove) {
-
-    if (potentialMove.style.backgroundColor == "rgba(255, 255, 0, 0.6)") {
-
-        let lastPiece = document.getElementById(currentPiece.location);
-
-        potentialMove.setAttribute("class", currentPiece.color);
-        potentialMove.setAttribute("src", currentPiece.source);
-
-        lastPiece.setAttribute("class","empty");
-        lastPiece.removeAttribute("src");
-
-    }
-
 }
 
 initGameBoard();

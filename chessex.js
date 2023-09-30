@@ -50,7 +50,7 @@ function initGameBoard() {
             column.className = "boardColumn";
             cell.setAttribute("id", `${columnNum}${rowNum}`);
             cell.setAttribute("class", "empty");
-            cell.setAttribute("src", "");
+            // cell.setAttribute("src", "");
             // cell.setAttribute("alt", `${columnNum}${rowNum}`);
             cell.setAttribute("width", "60px");
             cell.setAttribute("height", "60px");
@@ -190,11 +190,15 @@ document.getElementById("gameBoard").addEventListener("click", (e) => {
 function setMoveRange() {
 
     let possibleMoves = [];
+    let tempMoveArray = [];
+    let tempMove;
+
     let startingLocation = Number(currentPiece.location);
-    let moveDist;
+    let directionSet = [1, -1, 10, -10];
     let specialMove = 0;
     
     if (currentPiece.type === "pawn") {
+        let moveDist;
     
         if (currentPiece.color == "black") {
             moveDist = 1;
@@ -224,20 +228,19 @@ function setMoveRange() {
             }
         }
 
-        let pawnAttackLocation = [];
-        pawnAttackLocation.push(startingLocation + moveDist - 10);
-        pawnAttackLocation.push(startingLocation + moveDist + 10);
-        validLocation(pawnAttackLocation);
+        tempMoveArray.push(startingLocation + moveDist - 10);
+        tempMoveArray.push(startingLocation + moveDist + 10);
+        validLocation(tempMoveArray);
 
-        for (let i = 0; i < pawnAttackLocation.length; i++) {  
-            let pawnAttack = document.getElementById(pawnAttackLocation[i]);
+        for (let i = 0; i < tempMoveArray.length; i++) {  
+            let pawnAttack = document.getElementById(tempMoveArray[i]);
             if (currentPiece.color == "black") {
                 if (pawnAttack.classList.contains("white")) {
-                    possibleMoves.push(pawnAttackLocation[i]);
+                    possibleMoves.push(tempMoveArray[i]);
                 }
             } else if (currentPiece.color == "white") {
                 if (pawnAttack.classList.contains("black")) {
-                    possibleMoves.push(pawnAttackLocation[i]);
+                    possibleMoves.push(tempMoveArray[i]);
                 }
             }
         }
@@ -245,34 +248,31 @@ function setMoveRange() {
         validLocation(possibleMoves);
 
     } else if (currentPiece.type == "rook") {
-        let directionSet = [1, 10, -1, -10];
-        let rookSpaceCheck;
-        let rookSpaces = [];
 
         for (let i = 0; i < 4; i++) {
             for (let j = 0; j < 8; j++) {
-                rookSpaceCheck = startingLocation + (directionSet[i] * (j+1));
+                tempMove = startingLocation + (directionSet[i] * (j+1));
 
-                rookSpaces.push(rookSpaceCheck);
+                tempMoveArray.push(tempMove);
 
-                validLocation(rookSpaces);
+                validLocation(tempMoveArray);
 
-                if (rookSpaceCheck != rookSpaces[rookSpaces.length - 1]) {
-                    rookSpaceCheck = null;
+                if (tempMove != tempMoveArray[tempMoveArray.length - 1]) {
+                    tempMove = null;
                 }
 
-                // console.log(rookSpaceCheck);
+                // console.log(tempMove);
 
-                if (rookSpaceCheck == null || document.getElementById(rookSpaceCheck).getAttribute("class") != "empty") {
+                if (tempMove == null || document.getElementById(tempMove).getAttribute("class") != "empty") {
                     // console.log("Path is blocked.");
-                    if (rookSpaceCheck != null && currentPiece.color == "black" && document.getElementById(rookSpaceCheck).getAttribute("class") == "white") {
-                        possibleMoves.push(rookSpaceCheck);
-                    } else if (rookSpaceCheck != null && currentPiece.color == "white" && document.getElementById(rookSpaceCheck).getAttribute("class") == "black") {
-                        possibleMoves.push(rookSpaceCheck);
+                    if (tempMove != null && currentPiece.color == "black" && document.getElementById(tempMove).getAttribute("class") == "white") {
+                        possibleMoves.push(tempMove);
+                    } else if (tempMove != null && currentPiece.color == "white" && document.getElementById(tempMove).getAttribute("class") == "black") {
+                        possibleMoves.push(tempMove);
                     }
                     break;
                 } else {
-                    possibleMoves.push(rookSpaceCheck);
+                    possibleMoves.push(tempMove);
                 }
             }
         }
@@ -282,6 +282,30 @@ function setMoveRange() {
 
     } else if (currentPiece.type == "knight") {
         console.log("knight");
+
+        for (let i = 0; i < 4; i++) {
+            for (let j = 0; j < 2; j++) {
+
+                if (directionSet[i] > 1 || directionSet[i] < -1) {
+                    tempMoveArray.push(startingLocation + (directionSet[i] * 2) + (directionSet[j]));
+                } else {
+                    tempMoveArray.push(startingLocation + (directionSet[i] * 2) + (directionSet[j+2]));
+                }
+
+                validLocation(tempMoveArray);
+                // console.log(tempMoveArray);
+
+            }
+        }
+
+        for (let k = 0; k < tempMoveArray.length; k++) {
+            if (document.getElementById(tempMoveArray[k]).getAttribute("class") != currentPiece.color) {
+                possibleMoves.push(tempMoveArray[k]);
+            }
+        }
+
+        // console.log(possibleMoves);
+
     } else if (currentPiece.type == "bishop") {
         console.log("bishop");
     } else if (currentPiece.type == "queen") {
@@ -340,7 +364,7 @@ function movePiece(potentialMove) {
 
         lastPiece.setAttribute("class","empty");
         lastPiece.setAttribute("src", "");
-        // lastPiece.removeAttribute("src");
+        lastPiece.removeAttribute("src");
 
         let parent = lastPiece.parentNode;
         parent.removeChild(lastPiece);

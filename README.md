@@ -21,17 +21,19 @@ Done:
 - Add movement to Knights.
 - Change movement variables to shared variables amongst all pieces.
 - Add movement to Bishops.
+- Add movement to Queens.
 
 Current tasks:
 - Add movement to:
-    - Queen
     - King
 
 
 Future To Do:
 - Add ability for pawns to be exchanged for different pieces when they reach the enemy backline.
 - Add check system to king.
+- Add castling ability to king/rooks.
 - Add win/loss condition to game.
+- Add numbered/lettered labels to board to visualize coordinates.
 - Add "New Game" function.
 - Clean up code:
     - Redo ID naming system to get rid of need for arrays containing the row and column numbers. *use a for...loop system instead.*

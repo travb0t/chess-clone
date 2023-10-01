@@ -22,17 +22,17 @@ Done:
 - Change movement variables to shared variables amongst all pieces.
 - Add movement to Bishops.
 - Add movement to Queens.
+- Add movement to Kings.
+- Rework validLocation function from splice to push method that can check arrays more thoroughly.
 
 Current tasks:
-- Add movement to:
-    - King
+- Add check system.
+- Add win/loss condition to game.
 
 
 Future To Do:
 - Add ability for pawns to be exchanged for different pieces when they reach the enemy backline.
-- Add check system to king.
 - Add castling ability to king/rooks.
-- Add win/loss condition to game.
 - Add numbered/lettered labels to board to visualize coordinates.
 - Add "New Game" function.
 - Clean up code:

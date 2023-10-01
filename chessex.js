@@ -231,7 +231,8 @@ function setMoveRange() {
 
         tempMoveArray.push(startingLocation + moveDist - 10);
         tempMoveArray.push(startingLocation + moveDist + 10);
-        validLocation(tempMoveArray);
+        tempMoveArray = validLocation(tempMoveArray);
+        // console.log(tempMoveArray);
 
         for (let i = 0; i < tempMoveArray.length; i++) {  
             let pawnAttack = document.getElementById(tempMoveArray[i]);
@@ -246,7 +247,7 @@ function setMoveRange() {
             }
         }
 
-        validLocation(possibleMoves);
+        possibleMoves = validLocation(possibleMoves);
 
     } else if (currentPiece.type == "rook") {
         // console.log("rook");
@@ -257,7 +258,7 @@ function setMoveRange() {
 
                 tempMoveArray.push(tempMove);
 
-                validLocation(tempMoveArray);
+                tempMoveArray = validLocation(tempMoveArray);
 
                 if (tempMove != tempMoveArray[tempMoveArray.length - 1]) {
                     tempMove = null;
@@ -279,7 +280,7 @@ function setMoveRange() {
             }
         }
 
-        validLocation(possibleMoves);
+        possibleMoves = validLocation(possibleMoves);
         // console.log(possibleMoves);
 
     } else if (currentPiece.type == "knight") {
@@ -294,7 +295,7 @@ function setMoveRange() {
                     tempMoveArray.push(startingLocation + (directionSet[i] * 2) + (directionSet[j+2]));
                 }
 
-                validLocation(tempMoveArray);
+                tempMoveArray = validLocation(tempMoveArray);
                 // console.log(tempMoveArray);
 
             }
@@ -318,7 +319,7 @@ function setMoveRange() {
     
                     tempMoveArray.push(tempMove);
     
-                    validLocation(tempMoveArray);
+                    tempMoveArray = validLocation(tempMoveArray);
     
                     if (tempMove != tempMoveArray[tempMoveArray.length - 1]) {
                         tempMove = null;
@@ -341,7 +342,7 @@ function setMoveRange() {
             }
         }
 
-        validLocation(possibleMoves);
+        possibleMoves = validLocation(possibleMoves);
         // console.log(possibleMoves);
 
     } else if (currentPiece.type == "queen") {
@@ -353,7 +354,7 @@ function setMoveRange() {
 
                 tempMoveArray.push(tempMove);
 
-                validLocation(tempMoveArray);
+                tempMoveArray = validLocation(tempMoveArray);
 
                 if (tempMove != tempMoveArray[tempMoveArray.length - 1]) {
                     tempMove = null;
@@ -384,7 +385,7 @@ function setMoveRange() {
     
                     tempMoveArray.push(tempMove);
     
-                    validLocation(tempMoveArray);
+                    tempMoveArray = validLocation(tempMoveArray);
     
                     if (tempMove != tempMoveArray[tempMoveArray.length - 1]) {
                         tempMove = null;
@@ -407,11 +408,41 @@ function setMoveRange() {
             }
         }
 
-        validLocation(possibleMoves);
-        console.log(possibleMoves);
+        possibleMoves = validLocation(possibleMoves);
+        // console.log(possibleMoves);
 
     } else if (currentPiece.type == "king") {
-        console.log("king");
+        // console.log("king");
+
+        for (let i = 0; i < 2; i++) {
+
+            tempMove = startingLocation + directionSet[i];
+            tempMoveArray.push(tempMove);
+
+            for (let j = 0; j < 2; j++) {
+                tempMove = startingLocation + directionSet[i] + (directionSet[j+2]);
+                tempMoveArray.push(tempMove);
+            }
+
+            tempMove = startingLocation + directionSet[i+2];
+            tempMoveArray.push(tempMove);
+        }
+        // console.log(tempMoveArray);
+        tempMoveArray = validLocation(tempMoveArray);
+        // console.log(tempMoveArray);
+
+        for (let k = 0; k < tempMoveArray.length; k++) {
+            if (tempMoveArray.length != 0) {
+                if (document.getElementById(tempMoveArray[k]).getAttribute("class") != currentPiece.color) {
+                    possibleMoves.push(tempMoveArray[k]);
+                }
+            } else {
+                return;
+            }
+        }
+
+        possibleMoves = validLocation(possibleMoves);
+
     }
 
     // console.log(possibleMoves);
@@ -504,17 +535,18 @@ function movePiece(potentialMove) {
 }
 
 function validLocation(givenMoveArray) {
+    // console.log(givenMoveArray);
+    let validationArray = [];
+    let validationVar;
     for (let k = 0; k < givenMoveArray.length; k++) {
-        if (givenMoveArray[k] < 11 || givenMoveArray[k] > 88) {
-            givenMoveArray.splice(k, 1);
-        } else {
-            for (let l = 0; l < invalidSpaces.length; l++) {
-                if (givenMoveArray[k] == invalidSpaces[l]) {
-                    givenMoveArray.splice(k, 1);
-                }
+        validationVar = givenMoveArray[k];
+        if (validationVar > 10 && validationVar < 89) {
+            if (!invalidSpaces.includes(validationVar)) {
+                validationArray.push(givenMoveArray[k]);
             }
         }
     }
+    return validationArray;
 }
 
 initGameBoard();

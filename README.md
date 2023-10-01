@@ -20,10 +20,10 @@ Done:
 - Change the way the image is removed from an "empty" space to use a removeChild method. *this prevents non-refresh image ghosts.*
 - Add movement to Knights.
 - Change movement variables to shared variables amongst all pieces.
+- Add movement to Bishops.
 
 Current tasks:
 - Add movement to:
-    - Bishop
     - Queen
     - King
 

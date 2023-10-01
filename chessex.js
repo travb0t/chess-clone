@@ -198,6 +198,7 @@ function setMoveRange() {
     let specialMove = 0;
     
     if (currentPiece.type === "pawn") {
+        // console.log("pawn");
         let moveDist;
     
         if (currentPiece.color == "black") {
@@ -248,6 +249,7 @@ function setMoveRange() {
         validLocation(possibleMoves);
 
     } else if (currentPiece.type == "rook") {
+        // console.log("rook");
 
         for (let i = 0; i < 4; i++) {
             for (let j = 0; j < 8; j++) {
@@ -281,7 +283,7 @@ function setMoveRange() {
         // console.log(possibleMoves);
 
     } else if (currentPiece.type == "knight") {
-        console.log("knight");
+        // console.log("knight");
 
         for (let i = 0; i < 4; i++) {
             for (let j = 0; j < 2; j++) {
@@ -307,7 +309,41 @@ function setMoveRange() {
         // console.log(possibleMoves);
 
     } else if (currentPiece.type == "bishop") {
-        console.log("bishop");
+        // console.log("bishop");
+
+        for (let i = 0; i < 2; i++) {
+            for (let j = 0; j < 2; j++) {
+                for (let k = 0; k < 8; k++) {
+                    tempMove = startingLocation + (directionSet[i] * (k+1)) + (directionSet[j+2] * (k+1));
+    
+                    tempMoveArray.push(tempMove);
+    
+                    validLocation(tempMoveArray);
+    
+                    if (tempMove != tempMoveArray[tempMoveArray.length - 1]) {
+                        tempMove = null;
+                    }
+    
+                    // console.log(tempMove);
+    
+                    if (tempMove == null || document.getElementById(tempMove).getAttribute("class") != "empty") {
+                        // console.log("Path is blocked.");
+                        if (tempMove != null && currentPiece.color == "black" && document.getElementById(tempMove).getAttribute("class") == "white") {
+                            possibleMoves.push(tempMove);
+                        } else if (tempMove != null && currentPiece.color == "white" && document.getElementById(tempMove).getAttribute("class") == "black") {
+                            possibleMoves.push(tempMove);
+                        }
+                        break;
+                    } else {
+                        possibleMoves.push(tempMove);
+                    }
+                }
+            }
+        }
+
+        validLocation(possibleMoves);
+        // console.log(possibleMoves);
+
     } else if (currentPiece.type == "queen") {
         console.log("queen");
     } else if (currentPiece.type == "king") {

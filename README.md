@@ -25,13 +25,16 @@ Done:
 - Add movement to Kings.
 - Rework validLocation function from splice to push method that can check arrays more thoroughly.
 
-Current tasks:
 - Add check system.
-- Add win/loss condition to game.
+- Adds beginnings of a checkmate system.
+- Reworks Some systems to be compatible with new check/mate system.
+
+Current tasks:
+- Finish win/loss condition to game. (i.e. Check Mate)
 
 
 Future To Do:
-- Add ability for pawns to be exchanged for different pieces when they reach the enemy backline.
+- Add ability for pawns to be exchanged for different pieces when they reach the enemy back line.
 - Add castling ability to king/rooks.
 - Add numbered/lettered labels to board to visualize coordinates.
 - Add "New Game" function.

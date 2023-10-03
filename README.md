@@ -24,7 +24,6 @@ Done:
 - Add movement to Queens.
 - Add movement to Kings.
 - Rework validLocation function from splice to push method that can check arrays more thoroughly.
-
 - Add check system.
 - Adds beginnings of a checkmate system.
 - Reworks Some systems to be compatible with new check/mate system.

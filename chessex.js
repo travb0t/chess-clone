@@ -34,6 +34,8 @@ let forCheckMate = 0;
 let kingEscape;
 let inCheckBlack = 0;
 let inCheckWhite = 0;
+let checkMateBlack = 0;
+let checkMateWhite = 0;
 let attackerArray = [];
 let defenderArray = [];
 
@@ -136,64 +138,68 @@ function resetPieces() {
 
 document.getElementById("gameBoard").addEventListener("click", (e) => {
 
-    const targetPiece = e.target;
+    if (checkMateBlack == 0 && checkMateWhite == 0) {
 
-    if (previousPiece == 0) {
-        previousPiece = targetPiece;
-    } else if (targetPiece != previousPiece) {
-        previousPiece.style.backgroundColor = "rgba(0, 0, 0, 0)";
-        previousPiece = targetPiece;
-    }
+        const targetPiece = e.target;
 
-    if (currentPiece.color != targetPiece.getAttribute("class") && pieceSelected == 1 || targetPiece.classList.contains("empty")) {
-
-        if (pieceSelected == 1) {
-            movePiece(targetPiece);
+        if (previousPiece == 0) {
+            previousPiece = targetPiece;
+        } else if (targetPiece != previousPiece) {
+            previousPiece.style.backgroundColor = "rgba(0, 0, 0, 0)";
+            previousPiece = targetPiece;
         }
 
-        currentPiece = {
-            type: "",
-            color: targetPiece.getAttribute("class"),
-            location: "",
-            source: ""
-        };
+        if (currentPiece.color != targetPiece.getAttribute("class") && pieceSelected == 1 || targetPiece.classList.contains("empty")) {
+
+            if (pieceSelected == 1) {
+                movePiece(targetPiece);
+            }
+
+            currentPiece = {
+                type: "",
+                color: targetPiece.getAttribute("class"),
+                location: "",
+                source: ""
+            };
+
+            setMoveRange();
+
+            pieceSelected = 0;
+            previousMoves = [0];
+
+            // console.log("Empty");
+            return;
+
+        }
+
+        if (turnCount % 2 == 0) {
+            if (targetPiece.getAttribute("class") != "black") {
+                return;
+            }
+        } else if (turnCount % 2 != 0) {
+            if (targetPiece.getAttribute("class") != "white") {
+                return;
+            }
+        }
+
+        currentPiece.source = targetPiece.getAttribute("src");
+        currentPiece.color = targetPiece.getAttribute("class");
+        currentPiece.location = targetPiece.getAttribute("id");
+
+        for (let i = 0; i < 6; i++) {
+            if (currentPiece.source.includes(pieceName[i+3])) {
+                currentPiece.type = pieceName[i+3];
+            }
+        }
+
+        // console.log(currentPiece);
+
+        pieceSelected = 1;
+        targetPiece.style.backgroundColor = "rgba(144, 238, 144, 0.6)";
 
         setMoveRange();
 
-        pieceSelected = 0;
-        previousMoves = [0];
-
-        // console.log("Empty");
-        return;
-
     }
-
-    if (turnCount % 2 == 0) {
-        if (targetPiece.getAttribute("class") != "black") {
-            return;
-        }
-    } else if (turnCount % 2 != 0) {
-        if (targetPiece.getAttribute("class") != "white") {
-            return;
-        }
-    }
-
-    currentPiece.source = targetPiece.getAttribute("src");
-    currentPiece.color = targetPiece.getAttribute("class");
-    currentPiece.location = targetPiece.getAttribute("id");
-
-    for (let i = 0; i < 6; i++) {
-        if (currentPiece.source.includes(pieceName[i+3])) {
-            currentPiece.type = pieceName[i+3];
-        }
-    }
-
-    // console.log(currentPiece);
-
-    pieceSelected = 1;
-    targetPiece.style.backgroundColor = "rgba(144, 238, 144, 0.6)";
-
-    setMoveRange();
 
 })
 
@@ -232,8 +238,8 @@ function setMoveRange() {
             }
         }
     
-        if (forCheck != 1 || forCheckMate == 1) {
-
+        if (forCheck != 1 || forCheckMate == 1 && forCheck == 1) {
+            
             possibleMoves.push(startingLocation + moveDist);
 
             if (specialMove !== 0) {
@@ -288,7 +294,7 @@ function setMoveRange() {
 
                 // console.log(tempMove);
 
-                if (tempMove == null || document.getElementById(tempMove).getAttribute("class") != "empty") {
+                if (tempMove == null || document.getElementById(tempMove).getAttribute("class") != "empty" && document.getElementById(tempMove).hasAttribute("src")) {
                     // console.log("Path is blocked.");
                     if (tempMove != null && currentPiece.color == "black" && document.getElementById(tempMove).getAttribute("class") == "white") {
                         possibleMoves.push(tempMove);
@@ -349,7 +355,7 @@ function setMoveRange() {
     
                     // console.log(tempMove);
     
-                    if (tempMove == null || document.getElementById(tempMove).getAttribute("class") != "empty") {
+                    if (tempMove == null || document.getElementById(tempMove).getAttribute("class") != "empty" && document.getElementById(tempMove).hasAttribute("src")) {
                         // console.log("Path is blocked.");
                         if (tempMove != null && currentPiece.color == "black" && document.getElementById(tempMove).getAttribute("class") == "white") {
                             possibleMoves.push(tempMove);
@@ -384,7 +390,7 @@ function setMoveRange() {
 
                 // console.log(tempMove);
 
-                if (tempMove == null || document.getElementById(tempMove).getAttribute("class") != "empty") {
+                if (tempMove == null || document.getElementById(tempMove).getAttribute("class") != "empty" && document.getElementById(tempMove).hasAttribute("src")) {
                     // console.log("Path is blocked.");
                     if (tempMove != null && currentPiece.color == "black" && document.getElementById(tempMove).getAttribute("class") == "white") {
                         possibleMoves.push(tempMove);
@@ -415,7 +421,7 @@ function setMoveRange() {
     
                     // console.log(tempMove);
     
-                    if (tempMove == null || document.getElementById(tempMove).getAttribute("class") != "empty") {
+                    if (tempMove == null || document.getElementById(tempMove).getAttribute("class") != "empty" && document.getElementById(tempMove).hasAttribute("src")) {
                         // console.log("Path is blocked.");
                         if (tempMove != null && currentPiece.color == "black" && document.getElementById(tempMove).getAttribute("class") == "white") {
                             possibleMoves.push(tempMove);
@@ -456,10 +462,8 @@ function setMoveRange() {
         for (let k = 0; k < tempMoveArray.length; k++) {
             if (tempMoveArray.length != 0) {
                 if (document.getElementById(tempMoveArray[k]).getAttribute("class") != currentPiece.color) {
-                    if (!allPossibleMoves.includes(tempMoveArray[k])) {
-                        possibleMoves.push(tempMoveArray[k]);
-                    }
                     if (currentPiece.color == "white") {
+                        // console.log("black possible:" + blackPossibilities);
                         if (!blackPossibilities.includes(tempMoveArray[k])) {
                             possibleMoves.push(tempMoveArray[k]);
                         }
@@ -475,8 +479,10 @@ function setMoveRange() {
         }
 
         possibleMoves = validLocation(possibleMoves);
+        // console.log(possibleMoves);
 
         if (forCheckMate == 1) {
+            // console.log("kingEscape is set");
             kingEscape = Array.from(possibleMoves);
         }
 
@@ -484,6 +490,8 @@ function setMoveRange() {
 
     // console.log(possibleMoves);
 
+    // The following if(forCheck) is what builds the allPossibleMoves array as the 
+    // function runs through the pieces.
     if (forCheck == 1) {
 
         if (possibleMoves.length != 0) {
@@ -544,6 +552,9 @@ function movePiece(potentialMove) {
         }
 
         let checkMateArray = [];
+        let replacedPieceClass = [];
+        let replacedPieceLocation = [];
+        let replacedPieceSource = [];
 
         if (tempPiece.color == "black") {
             checkColor = "white";
@@ -569,7 +580,9 @@ function movePiece(potentialMove) {
 
         lastPiece.setAttribute("class", "empty");
         lastPiece.removeAttribute("src");
-
+        
+        // This segment (578-598) handles "not allowing" a player 
+        //to place themselves into check.
         if (checkColor == "white") {
             inCheckBlack = checkForCheck(checkColor);
         } else if (checkColor == "black") {
@@ -611,27 +624,36 @@ function movePiece(potentialMove) {
             passantSpace.removeAttribute("src");
         }
 
-        // checkForCheck(tempPiece.color);
+        // console.log(tempPiece.color);
 
-        
+        // Once a piece has successfully been moved we must check if the player who moved has placed
+        // their opponent into check
         if (tempPiece.color == "white") {
             inCheckBlack = checkForCheck(tempPiece.color);
         } else if (tempPiece.color == "black") {
             inCheckWhite = checkForCheck(tempPiece.color);
         }
-        forCheckMate = 1;
-        if (tempPiece.color == "white") {
-            inCheckWhite = checkForCheck(checkColor);
-        } else if (tempPiece.color == "black") {
-            inCheckBlack = checkForCheck(checkColor);
+        // This runs through the check system one more time to set the kingEscape value to accurately
+        // reflect the state of the board after the last piece was moved
+        if (inCheckBlack == 1 || inCheckWhite == 1) {
+            forCheckMate = 1;
+            if (tempPiece.color == "white") {
+                inCheckWhite = checkForCheck(checkColor);
+            } else if (tempPiece.color == "black") {
+                inCheckBlack = checkForCheck(checkColor);
+            }
+            forCheckMate = 0;
         }
-        forCheckMate = 0;
 
         // console.log(attackerArray);
         // console.log(defenderArray);
-        console.log(inCheckWhite);
+        // console.log(inCheckWhite);
+        // console.log(inCheckBlack);
 
+        // HANDLES check for CHECKMATE
         if (inCheckBlack == 1 || inCheckWhite == 1) {
+
+            // console.log("next onto checkmate");
 
             for (let i = 0; i < attackerArray.length; i++) {
                 if (defenderArray.includes(attackerArray[i])) {
@@ -641,58 +663,68 @@ function movePiece(potentialMove) {
 
             checkMateArray = [...new Set(checkMateArray)];
 
+            // console.log(checkMateArray);
+
             if (checkMateArray.length != 0) {
                 for (let j = 0; j < checkMateArray.length; j++) {
 
                     let dummyPiece = document.getElementById(checkMateArray[j]);
 
-                    dummyPiece.setAttribute("class", checkColor);
+                    replacedPieceClass.push(dummyPiece.getAttribute("class"));
+                    replacedPieceLocation.push(dummyPiece.getAttribute("id"));
 
-                    if (checkColor == "white") {
-                        dummyPiece.setAttribute("src", "./pieces/pawnW.png");
-                    } else if (checkColor == "black") {
-                        dummyPiece.setAttribute("src", "./pieces/pawnB.png");
+                    if (dummyPiece.hasAttribute("src")) {
+                        replacedPieceSource.push(dummyPiece.getAttribute("src"));
+                    } else if (!dummyPiece.hasAttribute("src")) {
+                        dummyPiece.setAttribute("src", "")
+                        replacedPieceSource.push(dummyPiece.getAttribute("src"));
                     }
 
-                }   
-            }
+                    // console.log(dummyPiece);
 
-            console.log(kingEscape);
+                    dummyPiece.setAttribute("class", checkColor);
 
-            if (kingEscape.length == 0) {
+
+                }  
+
+                // console.log(replacedPieceClass);
+                // console.log(replacedPieceLocation);
 
                 if (tempPiece.color == "white") {
                     inCheckBlack = checkForCheck(tempPiece.color);
-                    if (inCheckBlack == 1) {
+                    if (inCheckBlack == 1 && kingEscape.length == 0) {
+                        checkMateBlack = 1;
                         console.log("Check mate black");
                     }
                 } else if (tempPiece.color == "black") {
                     inCheckWhite = checkForCheck(tempPiece.color);
-                    if (inCheckWhite == 1) {
+                    if (inCheckWhite == 1 && kingEscape.length == 0) {
+                        checkMateWhite = 1;
                         console.log("Check mate white");
                     }
                 }
 
-            }
-
-            if (checkMateArray.length != 0) {
-                for (let k = 0; k < checkMateArray.length; k++) {
-
-                    let dummyPiece = document.getElementById(checkMateArray[k]);
-    
-                    dummyPiece.setAttribute("class", "empty");
-    
-                    if (checkColor == "white") {
-                        dummyPiece.removeAttribute("src");
-                    } else if (checkColor == "black") {
-                        dummyPiece.removeAttribute("src");
+                for (let k = 0; k < replacedPieceLocation.length; k++) {
+                    let replacedPiece = document.getElementById(replacedPieceLocation[k])
+                    replacedPiece.setAttribute("class", replacedPieceClass[k]);
+                    if (replacedPiece.getAttribute("src") == "") {
+                        replacedPiece.removeAttribute("src");
                     }
-    
                 }
-            }
-        }
 
-        // console.log(checkMateArray);
+            } else if (kingEscape.length == 0 && checkMateArray.length == 0) {
+
+                if (tempPiece.color == "white") {
+                    console.log("Check mate black");
+                    checkMateBlack = 1;
+                } else if (tempPiece.color == "black") {
+                    console.log("Check mate white");
+                    checkMateWhite = 1;
+                }
+
+            }
+
+        }
 
         turnCount += 1;
         
@@ -716,6 +748,20 @@ function movePiece(potentialMove) {
             };
         }
 
+    }
+
+    console.log(turnCount);
+
+    if (turnCount < 100) {
+
+        if (checkMateBlack == 1) {
+            document.getElementById("gameOverText").innerHTML = "Game over, WHITE wins!";
+        } else if (checkMateWhite == 1) {
+            document.getElementById("gameOverText").innerHTML = "Game over, BLACK wins!";
+        }
+
+    } else {
+        document.getElementById("gameOverText").innerHTML = "Turn limit reached. Its a Draw!";
     }
 
 }
@@ -788,14 +834,17 @@ function checkForCheck(givenColor) {
             kingCheck.color = document.getElementById(allPossibleMoves[i]).getAttribute("class");
         }
 
-        // console.log(kingCheck);
+        // if (kingCheck.type != "" && kingCheck.color != givenColor) {
+        //     console.log(kingCheck);
+        // }
 
         if (kingCheck.type.includes(pieceName[4]) && kingCheck.color != givenColor) {
-            console.log("check baby");
+            // console.log("check baby");
             inCheck = 1;
             break;
         } 
         else {
+            // console.log("resets Check");
             inCheck = 0;
         }
 

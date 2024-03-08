@@ -36,6 +36,7 @@ let inCheckBlack = 0;
 let inCheckWhite = 0;
 let checkMateBlack = 0;
 let checkMateWhite = 0;
+let gameDraw = 0;
 let attackerArray = [];
 let defenderArray = [];
 
@@ -138,7 +139,7 @@ function resetPieces() {
 
 document.getElementById("gameBoard").addEventListener("click", (e) => {
 
-    if (checkMateBlack == 0 && checkMateWhite == 0) {
+    if (checkMateBlack == 0 && checkMateWhite == 0 && gameDraw == 0) {
 
         const targetPiece = e.target;
 
@@ -761,6 +762,7 @@ function movePiece(potentialMove) {
         }
 
     } else {
+        gameDraw = 1;
         document.getElementById("gameOverText").innerHTML = "Turn limit reached. Its a Draw!";
     }
 
